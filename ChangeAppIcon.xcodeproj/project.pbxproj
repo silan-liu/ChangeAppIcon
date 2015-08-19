@@ -129,7 +129,7 @@
 				AD1009E21B82E4490070355B /* Sources */,
 				AD1009E31B82E4490070355B /* Frameworks */,
 				AD1009E41B82E4490070355B /* Resources */,
-				AD100A101B82E4540070355B /* ShellScript */,
+				AD100A101B82E4540070355B /* Run Script */,
 			);
 			buildRules = (
 			);
@@ -216,18 +216,19 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		AD100A101B82E4540070355B /* ShellScript */ = {
+		AD100A101B82E4540070355B /* Run Script */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputPaths = (
 			);
+			name = "Run Script";
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "PATH=${PATH}:/usr/local/bin\n\nbuildNumber=$(/usr/libexec/PlistBuddy -c \"Print CFBundleVersion\" \"${PROJECT_DIR}/${INFOPLIST_FILE}\")\nversionNumber=$(/usr/libexec/PlistBuddy -c \"Print CFBundleShortVersionString\" \"${PROJECT_DIR}/${INFOPLIST_FILE}\")\n\n#modify version\n#/usr/libexec/PlistBuddy -c \"Set :CFBundleShortVersionString \"2.3\"\" \"${PROJECT_DIR}/${INFOPLIST_FILE}\"\n\n\nfunction generateIcon () {\n    BASE_IMAGE_NAME=$1\n    \n    TARGET_PATH=\"${BUILT_PRODUCTS_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/${BASE_IMAGE_NAME}\"\n\n    BASE_IMAGE_PATH=$(find ${SRCROOT} -name ${BASE_IMAGE_NAME})\n    WIDTH=$(identify -format %w ${BASE_IMAGE_PATH})\n    echo \"width $WIDTH\"\n    \n    FONT_SIZE=$(echo \"$WIDTH * .15\" | bc -l)\n    echo \"font size $FONT_SIZE\"\n    \n    // debug\n    if [ \"${CONFIGURATION}\" == \"Debug\" ]; then\n    convert debugRibbon.png -resize ${WIDTH}x${WIDTH} resizedRibbon.png\n    convert ${BASE_IMAGE_PATH} -fill white -font Times-Bold -pointsize ${FONT_SIZE} -gravity south -annotate 0 \"$buildNumber\" - | composite resizedRibbon.png - ${TARGET_PATH}\n    fi\n    \n    // beta\n    if [ \"${CONFIGURATION}\" == \"Beta\" ]; then\n    convert betaRibbon.png -resize ${WIDTH}x${WIDTH} resizedRibbon.png\n    convert ${BASE_IMAGE_PATH} -fill white -font Times-Boldr -pointsize ${FONT_SIZE} -gravity south -annotate 0 \"$buildNumber\" - | composite resizedRibbon.png - ${TARGET_PATH}\n    fi\n}\n\n// call\ngenerateIcon \"AppIcon60x60@2x.png\"\ngenerateIcon \"AppIcon60x60@3x.png\"";
+			shellScript = "buildNumber=$(/usr/libexec/PlistBuddy -c \"Print CFBundleVersion\" \"${PROJECT_DIR}/${INFOPLIST_FILE}\")\nversionNumber=$(/usr/libexec/PlistBuddy -c \"Print CFBundleShortVersionString\" \"${PROJECT_DIR}/${INFOPLIST_FILE}\")\n\n#modify version\n#/usr/libexec/PlistBuddy -c \"Set :CFBundleShortVersionString \"2.3\"\" \"${PROJECT_DIR}/${INFOPLIST_FILE}\"\n\nPATH=${PATH}:/usr/local/bin\n\nfunction generateIcon () {\n    BASE_IMAGE_NAME=$1\n    \n    TARGET_PATH=\"${BUILT_PRODUCTS_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/${BASE_IMAGE_NAME}\"\n    echo $TARGET_PATH\n    \n    BASE_IMAGE_PATH=$(find ${SRCROOT} -name ${BASE_IMAGE_NAME})\n    \n    WIDTH=$(identify -format %w ${BASE_IMAGE_PATH})\n    echo \"width $WIDTH\"\n    \n    FONT_SIZE=$(echo \"$WIDTH * .15\" | bc -l)\n    echo \"font size $FONT_SIZE\"\n    \n    \n    if [ \"${CONFIGURATION}\" == \"Debug\" ]; then\n    convert debugRibbon.png -resize ${WIDTH}x${WIDTH} resizedRibbon.png\n    convert ${BASE_IMAGE_PATH} -fill white -font Times-Bold -pointsize ${FONT_SIZE} -gravity south -annotate 0 \"$buildNumber\" - | composite resizedRibbon.png - ${TARGET_PATH}\n    elif [ \"${CONFIGURATION}\" == \"Beta\" ]; then\n    convert betaRibbon.png -resize ${WIDTH}x${WIDTH} resizedRibbon.png\n    convert ${BASE_IMAGE_PATH} -fill white -font Times-Bold -pointsize ${FONT_SIZE} -gravity south -annotate 0 \"$buildNumber\" - | composite resizedRibbon.png - ${TARGET_PATH}\n    else\n    echo \"Release\"\n    fi\n}\n\ngenerateIcon \"AppIcon60x60@2x.png\"\ngenerateIcon \"AppIcon60x60@3x.png\"";
 		};
 /* End PBXShellScriptBuildPhase section */
 
